@@ -46,7 +46,7 @@ class OAuth2Controller(base.BaseController):
         # Log in attemps are fired when the user is not logged in and they click
         # on the log in button
 
-        # Get the page where the user was when the loggin attemp was fired
+        # Get the page where the user was when the login attemp was fired
         # When the user is not logged in, he/she should be redirected to the dashboard when
         # the system cannot get the previous page
         came_from_url = _get_previous_page(constants.INITIAL_PAGE)

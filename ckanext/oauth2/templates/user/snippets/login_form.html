@@ -33,7 +33,7 @@ Example:
     </form>
   </div>  
   <div class="col-sm-6 col-xs-12">
-    <a href="{% url_for controller="ckanext.oauth2.controller:OAuth2Controller", action="oauth2login" %}" >
+    <a href="{% url_for controller="ckanext.oauth2.controller:OAuth2Controller", action="oauth2login", came_from="/" %}" >
       <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg">&nbsp;Login with Google
     </a>
   </div>

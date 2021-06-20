@@ -183,11 +183,7 @@ class OAuth2Helper(object):
 
         # If the user does not exist, we have to create it...
         if user is None:
-            user = model.User(email=email)
-
-        # Now we update his/her user_name with the one provided by the OAuth2 service
-        # In the future, users will be obtained based on this field
-        user.name = user_name
+            user = model.User(email=email, name=user_name)
 
         # Update fullname
         if self.profile_api_fullname_field != "" and self.profile_api_fullname_field in user_data:
