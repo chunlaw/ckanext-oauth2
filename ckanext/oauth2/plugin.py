@@ -37,31 +37,6 @@ def _no_permissions(context, msg):
     user = context['user']
     return {'success': False, 'msg': msg.format(user=user)}
 
-
-@toolkit.auth_sysadmins_check
-def user_create(context, data_dict):
-    msg = toolkit._('Users cannot be created.')
-    return _no_permissions(context, msg)
-
-
-@toolkit.auth_sysadmins_check
-def user_update(context, data_dict):
-    msg = toolkit._('Users cannot be edited.')
-    return _no_permissions(context, msg)
-
-
-@toolkit.auth_sysadmins_check
-def user_reset(context, data_dict):
-    msg = toolkit._('Users cannot reset passwords.')
-    return _no_permissions(context, msg)
-
-
-@toolkit.auth_sysadmins_check
-def request_reset(context, data_dict):
-    msg = toolkit._('Users cannot reset passwords.')
-    return _no_permissions(context, msg)
-
-
 def _get_previous_page(default_page):
     if 'came_from' not in toolkit.request.params:
         came_from_url = toolkit.request.headers.get('Referer', default_page)
@@ -99,27 +74,15 @@ class OAuth2Plugin(plugins.SingletonPlugin):
     def before_map(self, m):
         log.debug('Setting up the redirections to the OAuth2 service')
 
-        m.connect('/user/login',
+        m.connect('/user/oauth2login',
                   controller='ckanext.oauth2.controller:OAuth2Controller',
-                  action='login')
+                  action='oauth2login')
 
         # We need to handle petitions received to the Callback URL
         # since some error can arise and we need to process them
         m.connect('/oauth2/callback',
                   controller='ckanext.oauth2.controller:OAuth2Controller',
                   action='callback')
-
-        # Redirect the user to the OAuth service register page
-        if self.register_url:
-            m.redirect('/user/register', self.register_url)
-
-        # Redirect the user to the OAuth service reset page
-        if self.reset_url:
-            m.redirect('/user/reset', self.reset_url)
-
-        # Redirect the user to the OAuth service reset page
-        if self.edit_url:
-            m.redirect('/user/edit/{user}', self.edit_url)
 
         return m
 
@@ -165,19 +128,16 @@ class OAuth2Plugin(plugins.SingletonPlugin):
             log.warn('The user is not currently logged...')
 
     def get_auth_functions(self):
-        # we need to prevent some actions being authorized.
+        # if we need to prevent some actions being authorized.
         return {
-            'user_create': user_create,
-            'user_update': user_update,
-            'user_reset': user_reset,
-            'request_reset': request_reset
+            #'user_create': user_create,
+            #'user_update': user_update,
+            #'user_reset': user_reset,
+            #'request_reset': request_reset
         }
 
     def update_config(self, config):
         # Update our configuration
-        self.register_url = os.environ.get("CKAN_OAUTH2_REGISTER_URL", config.get('ckan.oauth2.register_url', None))
-        self.reset_url = os.environ.get("CKAN_OAUTH2_RESET_URL", config.get('ckan.oauth2.reset_url', None))
-        self.edit_url = os.environ.get("CKAN_OAUTH2_EDIT_URL", config.get('ckan.oauth2.edit_url', None))
         self.authorization_header = os.environ.get("CKAN_OAUTH2_AUTHORIZATION_HEADER", config.get('ckan.oauth2.authorization_header', 'Authorization')).lower()
 
         # Add this plugin's templates dir to CKAN's extra_template_paths, so
